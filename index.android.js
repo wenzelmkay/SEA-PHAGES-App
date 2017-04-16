@@ -1,96 +1,124 @@
-import MapView from 'react-native-maps';
-import React, { Component } from 'react';
-import {
-    AppRegistry,
-    StyleSheet,
-    View,
-    Dimensions,
-} from 'react-native';
+import React, {Component} from 'react';
+import {Navigator, StatusBar, TouchableHighlight,
+    AppRegistry, StyleSheet, Text, View} from 'react-native';
+import HomePage from './HomePage.js';
+import DetailScreen from './DetailScreen.android.js';
+import MapPage from './MapPage.js';
 
-const styles = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
+const routes = [
+    {
+        title: 'HOME',
+        index: 0
     },
-    map: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+    {
+        title: 'MAP VIEW',
+        index: 1
     },
-});
-
-
-const {width, height} = Dimensions.get('window');
-const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.092;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
-
-class SEAPHAGES extends React.Component {
-
-    state = {
-        initialPosition: 'unknown',
-        lastPosition: 'unknown',
-    };
-
-    watchID: ?number = null;
-
-    componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-                this.setState(
-                    {currentRegion: {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        latitudeDelta: LATITUDE_DELTA,
-                        longitudeDelta: LONGITUDE_DELTA,
-            }});
-        },
-        (error) => alert(error.message),
-            {enableHighAccuracy: true,
-                timeout: 20000000,
-                maximumAge: 1000}
-        );
-        this.watchID = navigator.geolocation.watchPosition((position) => {
-            console.log(position);
-            this.setState(
-                {currentRegion: {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    latitudeDelta: LATITUDE_DELTA,
-                    longitudeDelta: LONGITUDE_DELTA,
-            }});
-
-        })
+    {
+        title: 'STUFF',
+        index: 2
     }
+];
 
-    componentWillUnmount() {
-        navigator.geolocation.clearWatch(this.watchID);
-    }
-
+class SEAPHAGES extends Component {
     render() {
-        //const { region } = this.props;
-
         return (
-            <View style ={styles.container}>
-                <MapView
-                    style = {styles.map}
-                    ref = "map"
-                    mapType = {"terrain"}
-                    initialPosition={this.state.currentRegion}
-                    showsUserLocation = {true}
+            <View style={styles.container}>
+                <StatusBar
+                    backgroundColor="darkred"
+                    barStyle="light-content"
+                />
+                <Navigator
+                    initialRoute={routes[0]}
+                    initialRouteStack={routes}
+                    renderScene={
+                        (route, navigator) => {
+                            switch (route.index) {
+                                case 0: return (<HomePage navigator={navigator} route={routes[route.index]} {...route.passProps}></HomePage>);
+                                case 1: return (<MapPage navigator={navigator} route={routes[route.index]} {...route.passProps}></MapPage>);
+                                case 2: return (<DetailScreen navigator={navigator} route={routes[route.index]} {...route.passProps}></DetailScreen>);
+                            }
+                        }
+                    }
+                    configureScene={
+                        (route, routeStack) =>
+                            Navigator.SceneConfigs.FloatFromBottom
+                    }
+
+                    navigationBar={
+                        <Navigator.NavigationBar
+                            routeMapper={{
+                                LeftButton: (route, navigator, index, navState) => {
+                                    return (
+                                        <TouchableHighlight onPress={()=>navigator.jumpTo(routes[0])}>
+                                            <Text style={styles.navigationBarText}>Home</Text>
+                                        </TouchableHighlight>
+                                    )
+                                    /*if (route.index === 0) {
+                                     return (
+                                     <Text style={styles.navigationBarText}>Home</Text>
+                                     )
+                                     }
+
+                                     else {
+                                     return (
+                                     <TouchableHighlight onPress={()=>navigator.push(routes[0])}>
+                                     <Text style={styles.navigationBarText}>Home</Text>
+                                     </TouchableHighlight>
+                                     ); }*/
+                                },
+                                RightButton: (route, navigator, index, navState) => {
+                                   return (
+                                        <TouchableHighlight onPress={()=>navigator.jumpTo(routes[1])}>
+                                            <Text style={styles.navigationBarText}>Map</Text>
+                                        </TouchableHighlight>
+                                    )
+                                },
+                                /*Title: (route, navigator, index, navState) => {
+                                    return (
+                                        <Text style={
+                                            [styles.navigationBarText, styles.navigationBarText]}>
+                                            {routes[route.index].title}
+                                        </Text>);
+                                    },*/
+                                Title: (route, navigator, index, navState) => {
+                                    return(
+                                        <TouchableHighlight onPress={()=>navigator.jumpTo(routes[2])}>
+                                        <Text style={styles.navigationBarText}>Stuff</Text>
+                                        </TouchableHighlight>
+                                )
+                            },
+                            }}
+                            style={styles.navigationBar}
+                        />
+                    }
                 />
             </View>
         );
     }
+}
 
-};
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    navigationBar:{
+        backgroundColor: 'darkred',
+    },
+    navigationBarText:{
+        color: 'white',
+        padding: 10,
+        fontSize: 15,
+        textAlign: "center",
+    },
+    titleText:{
+        fontSize: 20,
+        paddingTop: 10,
+        textAlign: "center",
+    }
+
+});
+
+
 
 AppRegistry.registerComponent('SEAPHAGES', () => SEAPHAGES);
