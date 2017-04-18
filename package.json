@@ -7,9 +7,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "ddp-client": "^0.1.1",
     "react": "15.4.2",
     "react-native": "0.42.3",
     "react-native-maps": "^0.13.1",
+    "react-native-meteor": "^1.0.3",
+    "react-native-popup-dialog": "^0.7.26",
     "rn-geolocation": "0.0.6"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@ import HomePage from './HomePage.js';
 import DetailScreen from './DetailScreen.android.js';
 import MapPage from './MapPage.js';
 
+
 const routes = [
     {
         title: 'HOME',
@@ -20,7 +21,13 @@ const routes = [
     }
 ];
 
+
+
+
+
+
 class SEAPHAGES extends Component {
+
     render() {
         return (
             <View style={styles.container}>

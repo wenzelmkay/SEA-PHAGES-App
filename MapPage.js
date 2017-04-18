@@ -12,7 +12,14 @@ import {
     Navigator,
     TouchableHighlight,
     Text,
+    Button,
+    Alert,
+    TouchableOpacity,
+    Modal,
+    TextInput,
 } from 'react-native';
+
+'use strict';
 
 const styles = StyleSheet.create({
     container: {
@@ -31,6 +38,13 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0,
     },
+    button:{
+        borderRadius: 10,
+        padding: 10,
+        backgroundColor: 'yellow',
+        borderColor: 'black',
+        margin: 50,
+    }
 });
 
 
@@ -41,6 +55,14 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 
 class MapPage extends React.Component {
+    state = {
+        modalVisible: false,
+    };
+
+    setModalVisible(visible) {
+        this.setState({modalVisible: visible});
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -92,8 +114,8 @@ class MapPage extends React.Component {
     }
 
     render() {
-
         return (
+
             <View style ={styles.container}>
                 <MapView
                     //styles.map is very important! it lets our map display!
@@ -106,7 +128,6 @@ class MapPage extends React.Component {
                     showsUserLocation = {true}
                     showsCompass = {true}>
 
-
                     <MapView.Marker //draggable = {true}
                         coordinate = {this.state.marker}
                         title = {Marker.sampleName}
@@ -114,7 +135,47 @@ class MapPage extends React.Component {
                     />
 
                 </MapView>
+
+                <Modal
+                    animationType={"slide"}
+                    transparent={false}
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {alert("Modal has been closed.")}}
+                >
+                    <View style={{marginTop: 22}}>
+                        <View>
+                            <Text>Sample Name</Text>
+                            <TextInput/>
+                            <Text>Date</Text>
+                            <TextInput/>
+                            <Text>Time</Text>
+                            <TextInput/>
+                            <Text>Latitude</Text>
+                            <TextInput/>
+                            <Text>Longitude</Text>
+                            <TextInput/>
+                            <Text>Weather Conditions</Text>
+                            <TextInput/>
+
+                            <TouchableOpacity style = {styles.button} onPress={() => {
+                                this.setModalVisible(!this.state.modalVisible)
+                            }}>
+                                <Text>Submit Sample</Text>
+                            </TouchableOpacity>
+
+                        </View>
+                    </View>
+                </Modal>
+
+                <TouchableOpacity style = {styles.button} onPress={() => {
+                    this.setModalVisible(true)
+                }}>
+                    <Text>Add Sample</Text>
+                </TouchableOpacity>
+
+
             </View>
+
         );
     }
 
