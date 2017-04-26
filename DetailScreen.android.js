@@ -18,6 +18,7 @@ import {
     TextInput,
 } from 'react-native';
 
+
 class DetailScreen extends Component {
     state = {
         modalVisible: false,

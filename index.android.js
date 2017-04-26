@@ -5,7 +5,6 @@ import HomePage from './HomePage.js';
 import DetailScreen from './DetailScreen.android.js';
 import MapPage from './MapPage.js';
 
-
 const routes = [
     {
         title: 'HOME',
@@ -22,11 +21,8 @@ const routes = [
 ];
 
 
-
-
-
-
 class SEAPHAGES extends Component {
+
 
     render() {
         return (
@@ -61,18 +57,6 @@ class SEAPHAGES extends Component {
                                             <Text style={styles.navigationBarText}>Home</Text>
                                         </TouchableHighlight>
                                     )
-                                    /*if (route.index === 0) {
-                                     return (
-                                     <Text style={styles.navigationBarText}>Home</Text>
-                                     )
-                                     }
-
-                                     else {
-                                     return (
-                                     <TouchableHighlight onPress={()=>navigator.push(routes[0])}>
-                                     <Text style={styles.navigationBarText}>Home</Text>
-                                     </TouchableHighlight>
-                                     ); }*/
                                 },
                                 RightButton: (route, navigator, index, navState) => {
                                    return (
@@ -81,13 +65,7 @@ class SEAPHAGES extends Component {
                                         </TouchableHighlight>
                                     )
                                 },
-                                /*Title: (route, navigator, index, navState) => {
-                                    return (
-                                        <Text style={
-                                            [styles.navigationBarText, styles.navigationBarText]}>
-                                            {routes[route.index].title}
-                                        </Text>);
-                                    },*/
+
                                 Title: (route, navigator, index, navState) => {
                                     return(
                                         <TouchableHighlight onPress={()=>navigator.jumpTo(routes[2])}>

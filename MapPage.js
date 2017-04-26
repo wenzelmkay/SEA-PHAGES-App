@@ -18,70 +18,66 @@ import {
     Modal,
     TextInput,
 } from 'react-native';
+import * as firebase from 'firebase';
 
 'use strict';
-
-const styles = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    map: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
-    button:{
-        borderRadius: 10,
-        padding: 10,
-        backgroundColor: 'yellow',
-        borderColor: 'black',
-        margin: 50,
-    }
-});
-
 
 const {width, height} = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.092;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
+// Initialize Firebase
+
+firebase.initializeApp(config);
 
 class MapPage extends React.Component {
     state = {
         modalVisible: false,
     };
-
     setModalVisible(visible) {
         this.setState({modalVisible: visible});
     };
 
     constructor(props) {
         super(props);
+        this.database = firebase.database();
+        //move writeDB() later
+        //this.writeDB();
+        this.itemsRef = firebase.database().ref();
         this.state = {
-            latitude: 0.0,
-            longitude: 0.0,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
+            region: {
+                latitude: null,
+                longitude: null,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+            },
+            markers: [],
         };
-        this.state = {
-            marker: {
-                latitude: 38.4200,
-                longitude: -78.8600,
-                sampleName: "Sample 1",
-                Weather: "Sunny",
-            }
-        };
+
+
         //this.onRegionChange = this.onRegionChange.bind(this);
     }
+
+    listenForItems(itemsRef) {
+        itemsRef.on('value', (snap) => {
+
+            // get children as an array
+            var items = [];
+            snap.forEach((child) => {
+                items.push({
+                    title: child.val().title,
+                    _key: child.key
+                });
+            });
+
+        });
+    }
+
+
+
     watchID: ?number = null;
+
 
     componentDidMount() {
         navigator.geolocation.getCurrentPosition(
@@ -92,7 +88,16 @@ class MapPage extends React.Component {
                         longitude: position.coords.longitude,
                         latitudeDelta: LATITUDE_DELTA,
                         longitudeDelta: LONGITUDE_DELTA,
-                    }});
+                        }
+                    },
+                );
+                this.setState(
+                    {
+                        myLat: position.coords.latitude,
+                        myLon: position.coords.longitude,
+                    },
+                );
+
             },
             /* (error) => alert(error.message),
              {enableHighAccuracy: true,
@@ -128,37 +133,41 @@ class MapPage extends React.Component {
                     showsUserLocation = {true}
                     showsCompass = {true}>
 
-                    <MapView.Marker //draggable = {true}
-                        coordinate = {this.state.marker}
-                        title = {Marker.sampleName}
-                        onDragEnd = {(e) => this.setState({ marker: e.nativeEvent.coordinate })}
-                    />
+                    {this.state.markers.map((marker, i) => (
+                        <MapView.Marker key={i} coordinate={{latitude: marker.latitude, longitude: marker.longitude}} title={marker.title} description={marker.description}>
+                            <View style={styles.pin}>
+                            </View>
+                        </MapView.Marker>
+                    ))}
 
                 </MapView>
+
+                <TouchableOpacity style = {styles.button} onPress={() => {
+                    this.setModalVisible(true)
+                }}>
+                    <Text>Add Sample</Text>
+                </TouchableOpacity>
 
                 <Modal
                     animationType={"slide"}
                     transparent={false}
-                    visible={this.state.modalVisible}
+                    visible={!!this.state.modalVisible}
                     onRequestClose={() => {alert("Modal has been closed.")}}
                 >
                     <View style={{marginTop: 22}}>
                         <View>
                             <Text>Sample Name</Text>
-                            <TextInput/>
-                            <Text>Date</Text>
-                            <TextInput/>
-                            <Text>Time</Text>
-                            <TextInput/>
-                            <Text>Latitude</Text>
-                            <TextInput/>
-                            <Text>Longitude</Text>
-                            <TextInput/>
-                            <Text>Weather Conditions</Text>
-                            <TextInput/>
+                            <TextInput placeholder="i.e. Muddy Creek Sample"
+                                       onChangeText={(text) => this.setState({sampleName: text})}
+                            />
+                            <Text>Current Latitude</Text>
+                            <Text>{this.state.myLat}</Text>
+                            <Text>Current Longitude</Text>
+                            <Text>{this.state.myLon}</Text>
 
                             <TouchableOpacity style = {styles.button} onPress={() => {
-                                this.setModalVisible(!this.state.modalVisible)
+                                this.setModalVisible(false);
+                                this.itemsRef.push({ sampleName: this.state.sampleName, latitude: this.state.myLat, longitude: this.state.myLon,  });
                             }}>
                                 <Text>Submit Sample</Text>
                             </TouchableOpacity>
@@ -166,12 +175,6 @@ class MapPage extends React.Component {
                         </View>
                     </View>
                 </Modal>
-
-                <TouchableOpacity style = {styles.button} onPress={() => {
-                    this.setModalVisible(true)
-                }}>
-                    <Text>Add Sample</Text>
-                </TouchableOpacity>
 
 
             </View>
@@ -183,5 +186,31 @@ class MapPage extends React.Component {
         navigator.geolocation.clearWatch(this.watchID);
     }
 };
+
+const styles = StyleSheet.create({
+    container: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    map: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    button:{
+        borderRadius: 10,
+        padding: 10,
+        backgroundColor: 'yellow',
+        borderColor: 'black',
+        margin: 50,
+    }
+});
 
 export default MapPage

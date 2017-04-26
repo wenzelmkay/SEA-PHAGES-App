@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "ddp-client": "^0.1.1",
+    "firebase": "^3.8.0",
     "react": "15.4.2",
     "react-native": "0.42.3",
     "react-native-maps": "^0.13.1",
