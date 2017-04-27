@@ -1,7 +1,4 @@
-/**
- * Created by wenzelmk on 4/13/17.
- */
-
+//importing different pages
 import React, {Component} from 'react';
 import {
     TouchableHighlight,
@@ -18,7 +15,7 @@ import {
     TextInput,
 } from 'react-native';
 
-
+//use class to define a component
 class DetailScreen extends Component {
     state = {
         modalVisible: false,
